@@ -419,6 +419,8 @@ async fn handle_create(
     let mut error_count = 0;
 
     for (croatian, spanish, pos) in &translations {
+        // Front: Target language (what you're learning) - Croatian
+        // Back: Base language (translation you know) - Spanish
         let front = croatian.clone();
         let back = format!("{}\n<br><small><i>{:?}</i></small>", spanish, pos);
 

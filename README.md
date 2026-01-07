@@ -1,333 +1,269 @@
-# Anki Deck Builder 🎉
+# Anki Deck Builder
 
-**Status:** ✅ Production Ready | **MVP:** Complete | **All 8 Phases:** Done
+**A Rust CLI tool that automatically creates language learning decks for Anki.**
 
-A Rust CLI tool that automatically creates language learning decks on Anki with the most frequently used words in a target language, paired with translations in a base language.
+Automatically generate Anki flashcard decks with the most frequently used words in your target language, paired with translations in your native language.
 
-**🇭🇷 → 🇪🇸 Current Focus:** Croatian to Spanish language learning decks
+**🇪🇸 → 🇭🇷 Spanish to Croatian language learning decks**
+
+---
 
 ## Features
 
-- 🎯 Automatically generates Anki decks for language learning
-- 📊 Uses frequency data to select the most common words
-- 🔤 Organizes words by part of speech (nouns, verbs, adjectives, etc.)
-- 🌐 Supports multiple translation services (DeepL, LibreTranslate)
-- 💾 Caches data locally to minimize API calls
-- 📦 Works with AnkiConnect for seamless integration
+- 🎯 **Automatic deck generation** - Create full Anki decks with one command
+- 📊 **Frequency-based** - Learn the most common words first
+- 🔤 **Organized by grammar** - Words categorized by part of speech
+- 🌐 **Auto-translation** - Powered by LibreTranslate API
+- 💾 **Smart caching** - Fast repeat runs, works offline
+- 🎨 **Beautiful CLI** - Interactive prompts with progress indicators
 
-## MVP Configuration
+---
 
-- **Target Language:** Croatian (hr)
-- **Base Language:** Spanish (es)
-- **Default Cards:** ~800 (100 words per part of speech)
+## Quick Start
 
-## Prerequisites
-
-### NixOS Setup (Recommended)
-
-This project includes a [`shell.nix`](shell.nix:1) file for NixOS users with all dependencies:
+### Prerequisites (NixOS)
 
 ```bash
-# Enter Nix development shell
+# Enter development environment (includes Rust and Anki)
 nix-shell
 
-# Or use direnv for automatic loading (optional)
-echo "use nix" > .envrc
+# Or use direnv for automatic activation
 direnv allow
 ```
 
-The Nix shell provides:
-- Rust toolchain (rustc, cargo, clippy, rust-analyzer)
-- Anki desktop application
-- All build dependencies
+### Prerequisites (Other Systems)
 
-### Manual Setup (Non-NixOS)
+1. Install [Rust](https://rustup.rs)
+2. Install [Anki Desktop](https://apps.ankiweb.net)
 
-1. **Rust** - Install from [rustup.rs](https://rustup.rs)
-2. **Anki Desktop** - Download from [apps.ankiweb.net](https://apps.ankiweb.net)
+### Install AnkiConnect
 
-### AnkiConnect Add-on (All Systems)
+In Anki:
+1. Tools → Add-ons → Get Add-ons
+2. Enter code: `2055492159`
+3. Restart Anki
 
-Install AnkiConnect in Anki:
-1. Open Anki
-2. Tools → Add-ons → Get Add-ons
-3. Code: `2055492159`
-4. Restart Anki
+[Detailed setup guide →](docs/ANKICONNECT_SETUP.md)
 
-**Verify the setup:**
-```bash
-# Test AnkiConnect connection
-cargo run -- test
-# or
-make run ARGS="test"
-```
-
-See [📖 AnkiConnect Setup Guide](docs/ANKICONNECT_SETUP.md) for detailed instructions and troubleshooting.
-
-## Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/anki-deck-builder.git
-cd anki-deck-builder
-
-# NixOS: Enter development shell
-nix-shell
-
-# Build the project
-cargo build --release
-
-# Install (optional)
-cargo install --path .
-```
-
-## Configuration
-
-Set environment variables for optimal experience:
-
-```bash
-# Optional: DeepL API key for better translations (free tier: 500k chars/month)
-export DEEPL_API_KEY="your-api-key-here"
-
-# Optional: Custom AnkiConnect URL (default: http://localhost:8765)
-export ANKICONNECT_URL="http://localhost:8765"
-
-# Optional: Custom LibreTranslate URL (default: https://libretranslate.com)
-export LIBRETRANSLATE_URL="https://libretranslate.com"
-```
+---
 
 ## Usage
 
-### Test AnkiConnect Connection
+### Test Connection
 
 ```bash
-# Verify Anki and AnkiConnect are working
-cargo run -- test
-# or
 make run ARGS="test"
 ```
 
-### Create a Language Deck
+### Create a Deck
 
-**Interactive mode** (recommended for first use):
+**Interactive mode** (recommended):
 ```bash
-cargo run -- create
-# or
 make run ARGS="create"
 ```
 
-The CLI will guide you through:
-- 🎯 Selecting target language (language to learn)
-- 🏠 Selecting base language (your native language)
-- 📚 Choosing or customizing the deck name
+The CLI will prompt you for:
+- Target language (language to learn)
+- Base language (your known language)  
+- Deck name
 
-**With command-line arguments:**
+**Command-line mode:**
 ```bash
-cargo run -- create \
-  --target-language Croatian \
-  --base-language Spanish \
-  --words-per-pos 100
+# Spanish to Croatian deck
+make run ARGS="create -t hr -b es"
 
-# Using language codes
-cargo run -- create -t hr -b es
+# Customize word count
+make run ARGS="create -t hr -b es --words-per-pos 50"
 
 # Custom deck name
-cargo run -- create \
-  -t Croatian \
-  -b Spanish \
-  -d "My Croatian Learning Deck"
-```
+make run ARGS="create -t hr -b es -d 'My Vocabulary'"
 
-**Dry run mode** (test configuration without creating deck):
-```bash
-cargo run -- create --dry-run
-# or
+# Test configuration without creating
 make run ARGS="create --dry-run"
 ```
 
-**Example interactive session:**
-```
+---
+
+## Example Session
+
+```bash
+$ make run ARGS="create -t Croatian -b Spanish"
+
 🚀 Anki Deck Builder - Language Learning Deck Creator
 
-? Select target language to learn ›
-❯ Croatian (hr)
-  Spanish (es)
-  English (en)
-  [... more ...]
+📊 Loading Croatian word frequency data...
+✅ Loaded Croatian word data (45 words)
 
-? Select base language (for translations) ›
-  Croatian (hr)
-❯ Spanish (es)
-  [... more ...]
+🌐 Translating 45 words from Croatian to Spanish...
+[========================================] 45/45 (100%)
+✅ Translation complete
 
-? Use default deck name: 'Croatian → Spanish (Top 800 Words)'? › yes
+📚 Creating Anki deck...
+✅ Connected to AnkiConnect
+✅ Created deck: 'Croatian → Spanish (Top 800 Words)'
 
-📋 Configuration Summary:
-  Target language: Croatian (hr)
-  Base language: Spanish (es)
-  Words per part of speech: 100
-  Total cards: ~800 (8 parts of speech)
-  Deck name: Croatian → Spanish (Top 800 Words)
+📝 Adding 45 cards to deck...
+[========================================] 45/45 (100%)
+✅ Cards added
+
+🎉 Deck creation complete!
+  ✅ 45 cards added successfully
+  📚 Deck: Croatian → Spanish (Top 800 Words)
+
+💡 Open Anki to start studying!
+```
+
+---
+
+## Card Format
+
+**Front** (Croatian - target language):
+```
+dan
+```
+
+**Back** (Spanish - the meaning, with grammar hint):
+```
+día
+<small><i>Noun</i></small>
+```
+
+💡 You see the Croatian word and recall what it means in Spanish!
+
+---
+
+## Configuration
+
+### Environment Variables
+
+```bash
+# Optional: Custom AnkiConnect URL (default: http://localhost:8765)
+export ANKICONNECT_URL="http://localhost:8765"
+
+# Optional: Custom LibreTranslate server
+export LIBRETRANSLATE_URL="https://libretranslate.com"
 ```
 
 ### View Configuration
 
 ```bash
-anki-deck-builder config --show
+make run ARGS="config --show"
 ```
 
-## Project Structure
+### Cache Location
 
+Data is cached in `~/.local/share/anki-deck-builder/`:
+- `frequency/` - Word frequency lists
+- `translations/` - Translated words
+
+**Clear cache:**
+```bash
+rm -rf ~/.local/share/anki-deck-builder/
 ```
-anki-deck-builder/
-├── src/
-│   ├── main.rs              # Entry point
-│   ├── cli.rs               # CLI interface
-│   ├── config.rs            # Configuration management
-│   ├── error.rs             # Error types
-│   ├── ankiweb/
-│   │   ├── mod.rs
-│   │   ├── client.rs        # AnkiConnect client
-│   │   └── models.rs        # Data models
-│   └── language/
-│       ├── mod.rs
-│       ├── frequency.rs     # Word frequency data
-│       └── translator.rs    # Translation service
-├── Cargo.toml
-└── README.md
-```
+
+---
 
 ## Development
 
-This project includes a [`Makefile`](Makefile:1) with common development tasks:
+### Build & Test
 
 ```bash
 # Show all available commands
 make help
 
-# Build the project
+# Build
 make build              # Debug mode
-make build-release      # Release mode (optimized)
+make build-release      # Release mode
 
-# Run the CLI
-make run ARGS="config --show"
-make run ARGS="create --target-language Croatian --base-language Spanish"
-
-# Testing
-make test               # Run all tests
-make test-verbose       # Run tests with output
+# Test
+make test               # Run unit tests
+make check              # Quick compile check
 
 # Code quality
 make fmt                # Format code
-make lint               # Run clippy linter
-make check              # Check for errors
-
-# Development workflow
-make dev                # Run format, lint, test, and build
-make ci                 # Run all CI checks
-
-# Other useful commands
-make clean              # Clean build artifacts
-make doc                # Generate and open documentation
-make install            # Install binary to ~/.cargo/bin
+make-lint               # Run linter
+make dev                # Run all checks
 ```
 
-### Quick Start
+### Project Structure
 
-```bash
-# NixOS: Enter development shell
-nix-shell
-
-# Build and run
-make build
-make run ARGS="config --show"
-
-# Run with logging
-RUST_LOG=debug make run ARGS="create"
+```
+anki-deck-builder/
+├── src/
+│   ├── cli.rs               # CLI interface
+│   ├── ankiweb/             # AnkiConnect client
+│   └── language/            # Translation & frequency data
+├── tests/                   # Integration tests
+├── docs/                    # Documentation
+├── Makefile                 # Development commands
+└── shell.nix                # NixOS environment
 ```
 
-### Documentation
+---
 
-**User Documentation:**
-- [📖 User Guide](docs/USER_GUIDE.md) - Complete usage manual with examples
-- [🔧 AnkiConnect Setup](docs/ANKICONNECT_SETUP.md) - Setup and troubleshooting
+## Supported Languages
 
-**Developer Documentation:**
-- [🎉 Project Complete](docs/PROJECT_COMPLETE.md) - Final project summary
-- [📋 Project Plan](docs/PROJECT_PLAN.md) - Original 8-phase plan
-- [📊 Progress Summary](docs/PROGRESS_SUMMARY.md) - Development tracking
+Croatian, Spanish, English, French, German, Italian, Portuguese, Russian, Japanese, Korean, Chinese, Arabic, Hindi, Dutch, Polish, Swedish, Norwegian, Danish, Finnish, Greek, Turkish
 
-**Phase Summaries:**
-- [Phase 1](docs/PHASE1_SUMMARY.md) - Project setup
-- [Phase 2](docs/PHASE2_SUMMARY.md) - AnkiConnect integration
-- [Phase 3](docs/PHASE3_SUMMARY.md) - Interactive CLI
-- [Phase 4](docs/PHASE4_SUMMARY.md) - Frequency data
-- [Phase 8](docs/PHASE8_SUMMARY.md) - Testing & refinement
+Note: Full frequency data currently available for Croatian and Spanish. Other languages have basic support.
 
-## How It Works
-
-1. **Connects to AnkiConnect** - Verifies Anki is running and accessible
-2. **Fetches Frequency Data** - Downloads most common Croatian words by part of speech
-3. **Translates Words** - Translates Croatian words to Spanish using DeepL/LibreTranslate
-4. **Creates Deck** - Generates a new Anki deck with the specified name
-5. **Adds Cards** - Creates flashcards with Croatian on front, Spanish on back
-
-## Roadmap
-
-### Phase 1: Project Setup ✅
-- [x] Initialize Rust project
-- [x] Set up dependencies
-- [x] Create project structure
-
-### Phase 2-8: Implementation 🚧
-- [ ] AnkiConnect integration
-- [ ] CLI interface with interactive prompts
-- [ ] Word frequency data fetching
-- [ ] Translation service implementation
-- [ ] Complete workflow orchestration
-- [ ] Testing and refinement
-
-## Future Enhancements
-
-- Direct AnkiWeb sync (no local Anki required)
-- Bidirectional cards (Croatian→Spanish and Spanish→Croatian)
-- Audio pronunciation
-- Example sentences
-- Images for nouns
-- Custom word lists
-- Multiple deck templates
-- Support for more language pairs
-
-## License
-
-MIT License - see LICENSE file for details
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+---
 
 ## Troubleshooting
 
-### AnkiConnect Not Found
+### "Failed to connect to AnkiConnect"
 
-Ensure:
-1. Anki is running
-2. AnkiConnect add-on is installed
-3. No firewall blocking localhost:8765
+1. Make sure Anki is running
+2. Verify AnkiConnect is installed (code: 2055492159)
+3. Test with: `make run ARGS="test"`
 
-### Translation Errors
+[Complete troubleshooting guide →](docs/ANKICONNECT_SETUP.md)
 
-If you encounter rate limits:
-1. Add a DeepL API key (free tier available)
-2. Reduce `--words-per-pos` to create smaller decks
-3. Wait a few minutes and try again
+### "Translation failed"
 
-### Missing Frequency Data
+- Requires internet connection for first run
+- Subsequent runs use cached translations
+- Try again if API is temporarily unavailable
 
-The tool will automatically download frequency data on first run. Ensure you have internet connectivity.
+### "Cards failed (may be duplicates)"
 
-## Credits
+This is normal if you've run the tool multiple times. Anki prevents duplicate cards. Use a different deck name or delete the existing deck first.
 
-- Frequency data sources: Leipzig Corpora Collection, Hermit Dave's FrequencyWords
-- Translation: DeepL API, LibreTranslate
-- Anki integration: AnkiConnect by FooSoft
+---
+
+## Documentation
+
+**User Guides:**
+- [User Guide](docs/USER_GUIDE.md) - Complete usage manual
+- [AnkiConnect Setup](docs/ANKICONNECT_SETUP.md) - Installation & troubleshooting
+
+**Developer Docs:**
+- [Project Complete](docs/PROJECT_COMPLETE.md) - Project summary and statistics
+- [Project Plan](docs/PROJECT_PLAN.md) - Technical architecture
+
+---
+
+## Future Enhancements
+
+- Expand word datasets (800+ words)
+- External data sources (Leipzig Corpora)
+- Audio pronunciation
+- Example sentences
+- Image support
+- More language pairs
+- DeepL API integration
+
+---
+
+## License
+
+MIT License
+
+## Contributing
+
+Contributions welcome! The project has a modular architecture that's easy to extend.
+
+---
+
+**Built with:** Rust 2021 | **Dependencies:** Tokio, reqwest, clap, dialoguer, indicatif  
+**Platforms:** Linux, macOS, Windows (via rustls-tls)
