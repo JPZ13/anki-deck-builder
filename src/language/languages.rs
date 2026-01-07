@@ -97,18 +97,17 @@ pub fn get_supported_languages() -> Vec<Language> {
 
 /// Get prioritized languages for selection (MVP languages first)
 pub fn get_prioritized_languages() -> Vec<Language> {
-    let mut languages = Vec::new();
-
-    // MVP languages first
-    languages.push(Language::new("hr", "Croatian"));
-    languages.push(Language::new("es", "Spanish"));
-
-    // Then common languages
-    languages.push(Language::new("en", "English"));
-    languages.push(Language::new("fr", "French"));
-    languages.push(Language::new("de", "German"));
-    languages.push(Language::new("it", "Italian"));
-    languages.push(Language::new("pt", "Portuguese"));
+    let mut languages = vec![
+        // MVP languages first
+        Language::new("hr", "Croatian"),
+        Language::new("es", "Spanish"),
+        // Then common languages
+        Language::new("en", "English"),
+        Language::new("fr", "French"),
+        Language::new("de", "German"),
+        Language::new("it", "Italian"),
+        Language::new("pt", "Portuguese"),
+    ];
 
     // Then rest alphabetically
     let mut others = get_supported_languages();

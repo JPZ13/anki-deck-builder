@@ -33,7 +33,7 @@ impl LibreTranslateClient {
         let client = Client::builder()
             .timeout(Duration::from_secs(30))
             .build()
-            .map_err(|e| AnkiDeckBuilderError::HttpError(e))?;
+            .map_err(AnkiDeckBuilderError::HttpError)?;
 
         Ok(Self {
             base_url,

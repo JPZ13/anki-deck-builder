@@ -29,7 +29,7 @@ impl AnkiClient {
         let client = Client::builder()
             .timeout(std::time::Duration::from_secs(30))
             .build()
-            .map_err(|e| AnkiDeckBuilderError::HttpError(e))?;
+            .map_err(AnkiDeckBuilderError::HttpError)?;
 
         Ok(Self { base_url, client })
     }
@@ -57,7 +57,7 @@ impl AnkiClient {
         let anki_response: AnkiResponse<u32> = response
             .json()
             .await
-            .map_err(|e| AnkiDeckBuilderError::HttpError(e))?;
+            .map_err(AnkiDeckBuilderError::HttpError)?;
 
         if let Some(error) = anki_response.error {
             return Err(AnkiDeckBuilderError::AnkiConnectError(error));
@@ -86,12 +86,12 @@ impl AnkiClient {
             .json(&request)
             .send()
             .await
-            .map_err(|e| AnkiDeckBuilderError::HttpError(e))?;
+            .map_err(AnkiDeckBuilderError::HttpError)?;
 
         let anki_response: AnkiResponse<i64> = response
             .json()
             .await
-            .map_err(|e| AnkiDeckBuilderError::HttpError(e))?;
+            .map_err(AnkiDeckBuilderError::HttpError)?;
 
         if let Some(error) = anki_response.error {
             return Err(AnkiDeckBuilderError::AnkiConnectError(error));
@@ -128,12 +128,12 @@ impl AnkiClient {
             .json(&request)
             .send()
             .await
-            .map_err(|e| AnkiDeckBuilderError::HttpError(e))?;
+            .map_err(AnkiDeckBuilderError::HttpError)?;
 
         let anki_response: AnkiResponse<i64> = response
             .json()
             .await
-            .map_err(|e| AnkiDeckBuilderError::HttpError(e))?;
+            .map_err(AnkiDeckBuilderError::HttpError)?;
 
         if let Some(error) = anki_response.error {
             return Err(AnkiDeckBuilderError::AnkiConnectError(error));
@@ -163,12 +163,12 @@ impl AnkiClient {
             .json(&request)
             .send()
             .await
-            .map_err(|e| AnkiDeckBuilderError::HttpError(e))?;
+            .map_err(AnkiDeckBuilderError::HttpError)?;
 
         let anki_response: AnkiResponse<Vec<String>> = response
             .json()
             .await
-            .map_err(|e| AnkiDeckBuilderError::HttpError(e))?;
+            .map_err(AnkiDeckBuilderError::HttpError)?;
 
         if let Some(error) = anki_response.error {
             return Err(AnkiDeckBuilderError::AnkiConnectError(error));

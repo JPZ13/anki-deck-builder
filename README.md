@@ -1,6 +1,10 @@
-# Anki Deck Builder
+# Anki Deck Builder 🎉
+
+**Status:** ✅ Production Ready | **MVP:** Complete | **All 8 Phases:** Done
 
 A Rust CLI tool that automatically creates language learning decks on Anki with the most frequently used words in a target language, paired with translations in a base language.
+
+**🇭🇷 → 🇪🇸 Current Focus:** Croatian to Spanish language learning decks
 
 ## Features
 
@@ -244,13 +248,21 @@ RUST_LOG=debug make run ARGS="create"
 
 ### Documentation
 
-- [📋 Project Plan](docs/PROJECT_PLAN.md) - Complete 8-phase development plan
-- [📊 Progress Summary](docs/PROGRESS_SUMMARY.md) - Detailed progress tracking
-- [✅ Phase 1 Summary](docs/PHASE1_SUMMARY.md) - Phase 1: Project setup
-- [✅ Phase 2 Summary](docs/PHASE2_SUMMARY.md) - Phase 2: AnkiConnect integration
-- [✅ Phase 3 Summary](docs/PHASE3_SUMMARY.md) - Phase 3: Interactive CLI interface
-- [✅ Phase 4 Summary](docs/PHASE4_SUMMARY.md) - Phase 4: Word frequency data
-- [📖 AnkiConnect Setup](docs/ANKICONNECT_SETUP.md) - Detailed setup and troubleshooting guide
+**User Documentation:**
+- [📖 User Guide](docs/USER_GUIDE.md) - Complete usage manual with examples
+- [🔧 AnkiConnect Setup](docs/ANKICONNECT_SETUP.md) - Setup and troubleshooting
+
+**Developer Documentation:**
+- [🎉 Project Complete](docs/PROJECT_COMPLETE.md) - Final project summary
+- [📋 Project Plan](docs/PROJECT_PLAN.md) - Original 8-phase plan
+- [📊 Progress Summary](docs/PROGRESS_SUMMARY.md) - Development tracking
+
+**Phase Summaries:**
+- [Phase 1](docs/PHASE1_SUMMARY.md) - Project setup
+- [Phase 2](docs/PHASE2_SUMMARY.md) - AnkiConnect integration
+- [Phase 3](docs/PHASE3_SUMMARY.md) - Interactive CLI
+- [Phase 4](docs/PHASE4_SUMMARY.md) - Frequency data
+- [Phase 8](docs/PHASE8_SUMMARY.md) - Testing & refinement
 
 ## How It Works
 

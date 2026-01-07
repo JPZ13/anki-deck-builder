@@ -62,10 +62,7 @@ impl FrequencyData {
     }
 
     pub fn add_word(&mut self, word: Word) {
-        self.words
-            .entry(word.pos.clone())
-            .or_insert_with(Vec::new)
-            .push(word);
+        self.words.entry(word.pos.clone()).or_default().push(word);
     }
 
     pub fn get_top_words(&self, pos: &PartOfSpeech, count: usize) -> Vec<Word> {

@@ -14,7 +14,7 @@ pub struct FrequencyEntry {
 /// Load frequency data for a given language
 pub async fn load_frequency_data(
     language_code: &str,
-    cache_dir: &PathBuf,
+    cache_dir: &std::path::Path,
 ) -> Result<FrequencyData> {
     // Try cache first
     if let Some(cached_data) = try_load_from_cache(language_code, cache_dir)? {
@@ -33,7 +33,10 @@ pub async fn load_frequency_data(
 }
 
 /// Try to load frequency data from cache
-fn try_load_from_cache(language_code: &str, cache_dir: &PathBuf) -> Result<Option<FrequencyData>> {
+fn try_load_from_cache(
+    language_code: &str,
+    cache_dir: &std::path::Path,
+) -> Result<Option<FrequencyData>> {
     let cache_file = get_cache_file_path(language_code, cache_dir);
 
     if !cache_file.exists() {
@@ -57,7 +60,11 @@ fn try_load_from_cache(language_code: &str, cache_dir: &PathBuf) -> Result<Optio
 }
 
 /// Save frequency data to cache
-fn save_to_cache(language_code: &str, data: &FrequencyData, cache_dir: &PathBuf) -> Result<()> {
+fn save_to_cache(
+    language_code: &str,
+    data: &FrequencyData,
+    cache_dir: &std::path::Path,
+) -> Result<()> {
     let cache_file = get_cache_file_path(language_code, cache_dir);
 
     // Create cache directory if it doesn't exist
@@ -74,7 +81,7 @@ fn save_to_cache(language_code: &str, data: &FrequencyData, cache_dir: &PathBuf)
 }
 
 /// Get cache file path for a language
-fn get_cache_file_path(language_code: &str, cache_dir: &PathBuf) -> PathBuf {
+fn get_cache_file_path(language_code: &str, cache_dir: &std::path::Path) -> PathBuf {
     cache_dir
         .join("frequency")
         .join(format!("{}_frequency.json", language_code))
