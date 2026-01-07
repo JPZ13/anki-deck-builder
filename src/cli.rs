@@ -261,11 +261,16 @@ async fn handle_create(
     } else {
         words_per_pos * 8
     };
-    println!("  Total cards: ~{} (8 parts of speech{})",
-             estimated_cards,
-             if bidirectional { ", bidirectional" } else { "" });
+    println!(
+        "  Total cards: ~{} (8 parts of speech{})",
+        estimated_cards,
+        if bidirectional { ", bidirectional" } else { "" }
+    );
     println!("  Deck name: {}", final_deck_name);
-    println!("  Bidirectional: {}", if bidirectional { "yes" } else { "no" });
+    println!(
+        "  Bidirectional: {}",
+        if bidirectional { "yes" } else { "no" }
+    );
     println!("  Dry run: {}", dry_run);
 
     if dry_run {
@@ -422,13 +427,19 @@ async fn handle_create(
     } else {
         translations.len()
     };
-    
-    println!("\n📝 Adding {} cards to deck{}",
-             total_cards,
-             if bidirectional { " (bidirectional)" } else { "" });
-    
+
+    println!(
+        "\n📝 Adding {} cards to deck{}",
+        total_cards,
+        if bidirectional {
+            " (bidirectional)"
+        } else {
+            ""
+        }
+    );
+
     use crate::Note;
-    
+
     let card_progress = ProgressBar::new(total_cards as u64);
     card_progress.set_style(
         ProgressStyle::default_bar()
@@ -437,18 +448,20 @@ async fn handle_create(
             .progress_chars("=>-"),
     );
     card_progress.set_message("Adding cards");
-    
+
     let mut success_count = 0;
     let mut error_count = 0;
-    
+
     for (croatian, spanish, pos) in &translations {
         // Direction 1: Croatian (target) → Spanish (base)
         // You see Croatian and recall the Spanish meaning
         let front1 = croatian.clone();
         let back1 = format!("{}\n<br><small><i>{:?}</i></small>", spanish, pos);
-        let note1 = Note::new(final_deck_name.clone(), front1, back1)
-            .with_tags(vec!["auto-generated".to_string(), "croatian-to-spanish".to_string()]);
-        
+        let note1 = Note::new(final_deck_name.clone(), front1, back1).with_tags(vec![
+            "auto-generated".to_string(),
+            "croatian-to-spanish".to_string(),
+        ]);
+
         match anki_client.add_note(&note1).await {
             Ok(_) => success_count += 1,
             Err(e) => {
@@ -457,15 +470,17 @@ async fn handle_create(
             }
         }
         card_progress.inc(1);
-        
+
         // Direction 2 (if bidirectional): Spanish (base) → Croatian (target)
         // You see Spanish and recall the Croatian word
         if bidirectional {
             let front2 = spanish.clone();
             let back2 = format!("{}\n<br><small><i>{:?}</i></small>", croatian, pos);
-            let note2 = Note::new(final_deck_name.clone(), front2, back2)
-                .with_tags(vec!["auto-generated".to_string(), "spanish-to-croatian".to_string()]);
-            
+            let note2 = Note::new(final_deck_name.clone(), front2, back2).with_tags(vec![
+                "auto-generated".to_string(),
+                "spanish-to-croatian".to_string(),
+            ]);
+
             match anki_client.add_note(&note2).await {
                 Ok(_) => success_count += 1,
                 Err(e) => {
@@ -476,7 +491,7 @@ async fn handle_create(
             card_progress.inc(1);
         }
     }
-    
+
     card_progress.finish_with_message("✅ Cards added");
 
     println!("\n🎉 Deck creation complete!");

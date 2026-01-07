@@ -101,97 +101,12 @@ async fn fetch_frequency_data(language_code: &str) -> Result<FrequencyData> {
 
 /// Load Croatian frequency data
 async fn load_croatian_data() -> Result<FrequencyData> {
-    // For MVP, use embedded sample data
-    // TODO: In production, fetch from Leipzig Corpora or hrWaC
-    tracing::info!("Loading Croatian frequency data (embedded sample)");
+    use crate::language::frequency_fetcher::fetch_croatian_frequency;
 
-    let mut data = FrequencyData::new("hr".to_string());
+    tracing::info!("Fetching Croatian frequency data from online sources...");
 
-    // Sample Croatian nouns (most common)
-    let nouns = vec![
-        ("dan", 1),
-        ("vrijeme", 2),
-        ("dio", 3),
-        ("način", 4),
-        ("godina", 5),
-        ("život", 6),
-        ("država", 7),
-        ("ljudi", 8),
-        ("svijet", 9),
-        ("posao", 10),
-        ("mjesto", 11),
-        ("kuća", 12),
-        ("grad", 13),
-        ("stvar", 14),
-        ("dijete", 15),
-        ("čovjek", 16),
-        ("ime", 17),
-        ("ruka", 18),
-        ("glava", 19),
-        ("oko", 20),
-    ];
-
-    for (word, rank) in nouns {
-        data.add_word(Word {
-            text: word.to_string(),
-            pos: PartOfSpeech::Noun,
-            frequency: 0,
-            rank,
-        });
-    }
-
-    // Sample Croatian verbs
-    let verbs = vec![
-        ("biti", 1),
-        ("moći", 2),
-        ("htjeti", 3),
-        ("imati", 4),
-        ("reći", 5),
-        ("znati", 6),
-        ("ići", 7),
-        ("vidjeti", 8),
-        ("dati", 9),
-        ("doći", 10),
-        ("uzeti", 11),
-        ("raditi", 12),
-        ("pričati", 13),
-        ("misliti", 14),
-        ("naći", 15),
-    ];
-
-    for (word, rank) in verbs {
-        data.add_word(Word {
-            text: word.to_string(),
-            pos: PartOfSpeech::Verb,
-            frequency: 0,
-            rank,
-        });
-    }
-
-    // Sample Croatian adjectives
-    let adjectives = vec![
-        ("dobar", 1),
-        ("veliki", 2),
-        ("mali", 3),
-        ("novi", 4),
-        ("stari", 5),
-        ("prvi", 6),
-        ("drugi", 7),
-        ("vlastiti", 8),
-        ("pravi", 9),
-        ("važan", 10),
-    ];
-
-    for (word, rank) in adjectives {
-        data.add_word(Word {
-            text: word.to_string(),
-            pos: PartOfSpeech::Adjective,
-            frequency: 0,
-            rank,
-        });
-    }
-
-    Ok(data)
+    // Fetch from Hermit Dave's FrequencyWords repository (50k words)
+    fetch_croatian_frequency().await
 }
 
 /// Load Spanish frequency data
@@ -241,13 +156,15 @@ mod tests {
     use tempfile::tempdir;
 
     #[tokio::test]
+    #[ignore] // Requires internet connection to fetch real data
     async fn test_load_croatian_data() {
         let data = load_croatian_data().await.unwrap();
         assert_eq!(data.language, "hr");
 
-        let nouns = data.get_top_words(&PartOfSpeech::Noun, 10);
-        assert!(!nouns.is_empty());
-        assert_eq!(nouns[0].text, "dan");
+        // Should have words in multiple categories
+        let all_words = data.get_all_top_words(10);
+        assert!(!all_words.is_empty(), "Should have fetched Croatian words");
+        assert!(all_words.len() >= 10, "Should have at least 10 words");
     }
 
     #[tokio::test]

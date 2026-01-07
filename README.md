@@ -4,7 +4,9 @@
 
 Automatically generate Anki flashcard decks with the most frequently used words in your target language, paired with translations in your native language.
 
-**🇪🇸 → 🇭🇷 Spanish to Croatian language learning decks**
+**🇪🇸 → 🇭🇷 Spanish to Croatian language learning**
+
+Fetches **50,000 Croatian words** from Hermit Dave's FrequencyWords repository, automatically categorizes by part of speech, and creates Anki flashcards with Spanish translations.
 
 ---
 

@@ -1,4 +1,5 @@
 pub mod frequency;
+pub mod frequency_fetcher;
 pub mod frequency_loader;
 pub mod languages;
 pub mod libre_translate;
