@@ -36,6 +36,10 @@ pub enum Commands {
         /// Dry run - preview without creating the deck
         #[arg(long, default_value = "false")]
         dry_run: bool,
+
+        /// Create bidirectional cards (both target→base and base→target)
+        #[arg(long, default_value = "true")]
+        bidirectional: bool,
     },
 
     /// Configure AnkiConnect settings
@@ -61,6 +65,7 @@ pub async fn run() -> Result<()> {
             words_per_pos,
             deck_name,
             dry_run,
+            bidirectional,
         } => {
             handle_create(
                 target_language,
@@ -68,6 +73,7 @@ pub async fn run() -> Result<()> {
                 words_per_pos,
                 deck_name,
                 dry_run,
+                bidirectional,
             )
             .await
         }
@@ -133,6 +139,7 @@ async fn handle_create(
     words_per_pos: usize,
     deck_name: Option<String>,
     dry_run: bool,
+    bidirectional: bool,
 ) -> Result<()> {
     use crate::language::{get_language, get_prioritized_languages};
     use dialoguer::{theme::ColorfulTheme, Confirm, Input, Select};
@@ -249,8 +256,16 @@ async fn handle_create(
     );
     println!("  Base language: {} ({})", base_lang.name, base_lang.code);
     println!("  Words per part of speech: {}", words_per_pos);
-    println!("  Total cards: ~{} (8 parts of speech)", words_per_pos * 8);
+    let estimated_cards = if bidirectional {
+        words_per_pos * 8 * 2 // Double for bidirectional
+    } else {
+        words_per_pos * 8
+    };
+    println!("  Total cards: ~{} (8 parts of speech{})",
+             estimated_cards,
+             if bidirectional { ", bidirectional" } else { "" });
     println!("  Deck name: {}", final_deck_name);
+    println!("  Bidirectional: {}", if bidirectional { "yes" } else { "no" });
     println!("  Dry run: {}", dry_run);
 
     if dry_run {
@@ -402,11 +417,19 @@ async fn handle_create(
     }
 
     // Add cards
-    println!("\n📝 Adding {} cards to deck...", translations.len());
-
+    let total_cards = if bidirectional {
+        translations.len() * 2
+    } else {
+        translations.len()
+    };
+    
+    println!("\n📝 Adding {} cards to deck{}",
+             total_cards,
+             if bidirectional { " (bidirectional)" } else { "" });
+    
     use crate::Note;
-
-    let card_progress = ProgressBar::new(translations.len() as u64);
+    
+    let card_progress = ProgressBar::new(total_cards as u64);
     card_progress.set_style(
         ProgressStyle::default_bar()
             .template("{msg} [{bar:40}] {pos}/{len} ({percent}%)")
@@ -414,31 +437,46 @@ async fn handle_create(
             .progress_chars("=>-"),
     );
     card_progress.set_message("Adding cards");
-
+    
     let mut success_count = 0;
     let mut error_count = 0;
-
+    
     for (croatian, spanish, pos) in &translations {
-        // Front: Target language (what you're learning) - Croatian
-        // Back: Base language (translation you know) - Spanish
-        let front = croatian.clone();
-        let back = format!("{}\n<br><small><i>{:?}</i></small>", spanish, pos);
-
-        let note = Note::new(final_deck_name.clone(), front, back);
-
-        match anki_client.add_note(&note).await {
-            Ok(_) => {
-                success_count += 1;
-            }
+        // Direction 1: Croatian (target) → Spanish (base)
+        // You see Croatian and recall the Spanish meaning
+        let front1 = croatian.clone();
+        let back1 = format!("{}\n<br><small><i>{:?}</i></small>", spanish, pos);
+        let note1 = Note::new(final_deck_name.clone(), front1, back1)
+            .with_tags(vec!["auto-generated".to_string(), "croatian-to-spanish".to_string()]);
+        
+        match anki_client.add_note(&note1).await {
+            Ok(_) => success_count += 1,
             Err(e) => {
-                tracing::warn!("Failed to add note for '{}': {}", croatian, e);
+                tracing::warn!("Failed to add note for '{}→{}': {}", croatian, spanish, e);
                 error_count += 1;
             }
         }
-
         card_progress.inc(1);
+        
+        // Direction 2 (if bidirectional): Spanish (base) → Croatian (target)
+        // You see Spanish and recall the Croatian word
+        if bidirectional {
+            let front2 = spanish.clone();
+            let back2 = format!("{}\n<br><small><i>{:?}</i></small>", croatian, pos);
+            let note2 = Note::new(final_deck_name.clone(), front2, back2)
+                .with_tags(vec!["auto-generated".to_string(), "spanish-to-croatian".to_string()]);
+            
+            match anki_client.add_note(&note2).await {
+                Ok(_) => success_count += 1,
+                Err(e) => {
+                    tracing::warn!("Failed to add note for '{}→{}': {}", spanish, croatian, e);
+                    error_count += 1;
+                }
+            }
+            card_progress.inc(1);
+        }
     }
-
+    
     card_progress.finish_with_message("✅ Cards added");
 
     println!("\n🎉 Deck creation complete!");

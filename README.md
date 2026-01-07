@@ -11,7 +11,8 @@ Automatically generate Anki flashcard decks with the most frequently used words 
 ## Features
 
 - 🎯 **Automatic deck generation** - Create full Anki decks with one command
-- 📊 **Frequency-based** - Learn the most common words first
+- 🔄 **Bidirectional cards** - Practice both recognition and production (default)
+- � **Frequency-based** - Learn the most common words first
 - 🔤 **Organized by grammar** - Words categorized by part of speech
 - 🌐 **Auto-translation** - Powered by LibreTranslate API
 - 💾 **Smart caching** - Fast repeat runs, works offline
@@ -69,8 +70,11 @@ The CLI will prompt you for:
 
 **Command-line mode:**
 ```bash
-# Spanish to Croatian deck
+# Create bidirectional deck (default - 90 cards: 45 words × 2 directions)
 make run ARGS="create -t hr -b es"
+
+# Create unidirectional deck (45 cards: Croatian→Spanish only)
+make run ARGS="create -t hr -b es --bidirectional=false"
 
 # Customize word count
 make run ARGS="create -t hr -b es --words-per-pos 50"
@@ -117,18 +121,25 @@ $ make run ARGS="create -t Croatian -b Spanish"
 
 ## Card Format
 
-**Front** (Croatian - target language):
-```
-dan
-```
+### Bidirectional Cards (Default)
 
-**Back** (Spanish - the meaning, with grammar hint):
-```
-día
-<small><i>Noun</i></small>
-```
+By default, creates **2 cards per word** for comprehensive learning:
 
-💡 You see the Croatian word and recall what it means in Spanish!
+**Card 1 - Recognition:** Croatian → Spanish
+- **Front:** `dan`
+- **Back:** `día` *(Noun)*
+- *You see Croatian and recall the Spanish meaning*
+
+**Card 2 - Production:** Spanish → Croatian
+- **Front:** `día`
+- **Back:** `dan` *(Noun)*
+- *You see Spanish and produce the Croatian word*
+
+### Unidirectional Cards
+
+Use `--bidirectional=false` for recognition-only (Croatian →  Spanish):
+- **Front:** `dan`
+- **Back:** `día` *(Noun)*
 
 ---
 
