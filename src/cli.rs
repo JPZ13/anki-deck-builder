@@ -131,13 +131,132 @@ async fn handle_create(
     deck_name: Option<String>,
     dry_run: bool,
 ) -> Result<()> {
-    // TODO: Implement in Phase 3
-    println!("Create command placeholder");
-    println!("Target: {:?}", target_language);
-    println!("Base: {:?}", base_language);
-    println!("Words per POS: {}", words_per_pos);
-    println!("Deck name: {:?}", deck_name);
-    println!("Dry run: {}", dry_run);
+    use crate::language::{get_language, get_prioritized_languages};
+    use dialoguer::{Select, Input, Confirm, theme::ColorfulTheme};
+    
+    println!("🚀 Anki Deck Builder - Language Learning Deck Creator\n");
+    
+    // Get target language (either from arg or interactive prompt)
+    let target_lang = match target_language {
+        Some(lang_input) => {
+            match get_language(&lang_input) {
+                Some(lang) => {
+                    println!("🎯 Target language: {} ({})", lang.name, lang.code);
+                    lang
+                }
+                None => {
+                    eprintln!("❌ Unsupported language: {}", lang_input);
+                    eprintln!("Use 'Croatian', 'hr', or run without --target-language for a selection menu");
+                    return Err(anyhow::anyhow!("Unsupported language: {}", lang_input));
+                }
+            }
+        }
+        None => {
+            let languages = get_prioritized_languages();
+            let lang_names: Vec<String> = languages.iter()
+                .map(|l| format!("{} ({})", l.name, l.code))
+                .collect();
+            
+            let selection = Select::with_theme(&ColorfulTheme::default())
+                .with_prompt("Select target language to learn")
+                .items(&lang_names)
+                .default(0) // Croatian by default
+                .interact()?;
+            
+            let selected = languages[selection].clone();
+            println!("🎯 Target language: {} ({})", selected.name, selected.code);
+            selected
+        }
+    };
+    
+    // Get base language (either from arg or interactive prompt)
+    let base_lang = match base_language {
+        Some(lang_input) => {
+            match get_language(&lang_input) {
+                Some(lang) => {
+                    println!("🏠 Base language: {} ({})", lang.name, lang.code);
+                    lang
+                }
+                None => {
+                    eprintln!("❌ Unsupported language: {}", lang_input);
+                    return Err(anyhow::anyhow!("Unsupported language: {}", lang_input));
+                }
+            }
+        }
+        None => {
+            let languages = get_prioritized_languages();
+            let lang_names: Vec<String> = languages.iter()
+                .map(|l| format!("{} ({})", l.name, l.code))
+                .collect();
+            
+            let selection = Select::with_theme(&ColorfulTheme::default())
+                .with_prompt("Select base language (for translations)")
+                .items(&lang_names)
+                .default(1) // Spanish by default
+                .interact()?;
+            
+            let selected = languages[selection].clone();
+            println!("🏠 Base language: {} ({})", selected.name, selected.code);
+            selected
+        }
+    };
+    
+    // Validate that target and base languages are different
+    if target_lang.code == base_lang.code {
+        eprintln!("❌ Target and base languages must be different!");
+        return Err(anyhow::anyhow!("Target and base languages are the same"));
+    }
+    
+    // Get deck name (either from arg or generate/prompt)
+    let final_deck_name = match deck_name {
+        Some(name) => {
+            println!("📚 Deck name: {}", name);
+            name
+        }
+        None => {
+            let default_name = format!("{} → {} (Top {} Words)",
+                                       target_lang.name,
+                                       base_lang.name,
+                                       words_per_pos * 8); // 8 parts of speech
+            
+            let use_default = Confirm::with_theme(&ColorfulTheme::default())
+                .with_prompt(format!("Use default deck name: '{}'?", default_name))
+                .default(true)
+                .interact()?;
+            
+            if use_default {
+                println!("📚 Deck name: {}", default_name);
+                default_name
+            } else {
+                let custom_name: String = Input::with_theme(&ColorfulTheme::default())
+                    .with_prompt("Enter custom deck name")
+                    .interact_text()?;
+                println!("📚 Deck name: {}", custom_name);
+                custom_name
+            }
+        }
+    };
+    
+    println!("\n📋 Configuration Summary:");
+    println!("  Target language: {} ({})", target_lang.name, target_lang.code);
+    println!("  Base language: {} ({})", base_lang.name, base_lang.code);
+    println!("  Words per part of speech: {}", words_per_pos);
+    println!("  Total cards: ~{} (8 parts of speech)", words_per_pos * 8);
+    println!("  Deck name: {}", final_deck_name);
+    println!("  Dry run: {}", dry_run);
+    
+    if dry_run {
+        println!("\n🔍 Dry run mode - no deck will be created");
+        println!("✅ Configuration validated successfully!");
+        return Ok(());
+    }
+    
+    println!("\n⚠️  Deck creation not yet implemented (Phase 4-7)");
+    println!("💡 This will be implemented in the next phases:");
+    println!("  - Phase 4: Fetch {} word frequency data", target_lang.name);
+    println!("  - Phase 5: Translate words from {} to {}", target_lang.name, base_lang.name);
+    println!("  - Phase 6-7: Create deck and add cards to Anki");
+    
     Ok(())
 }
 

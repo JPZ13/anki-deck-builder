@@ -94,23 +94,76 @@ export LIBRETRANSLATE_URL="https://libretranslate.com"
 
 ## Usage
 
-### Create a Language Deck
+### Test AnkiConnect Connection
 
 ```bash
-# Interactive mode (will prompt for missing information)
-anki-deck-builder create
+# Verify Anki and AnkiConnect are working
+cargo run -- test
+# or
+make run ARGS="test"
+```
 
-# With arguments
-anki-deck-builder create \
+### Create a Language Deck
+
+**Interactive mode** (recommended for first use):
+```bash
+cargo run -- create
+# or
+make run ARGS="create"
+```
+
+The CLI will guide you through:
+- 🎯 Selecting target language (language to learn)
+- 🏠 Selecting base language (your native language)
+- 📚 Choosing or customizing the deck name
+
+**With command-line arguments:**
+```bash
+cargo run -- create \
   --target-language Croatian \
   --base-language Spanish \
   --words-per-pos 100
 
-# Dry run (preview without creating)
-anki-deck-builder create \
-  --target-language Croatian \
-  --base-language Spanish \
-  --dry-run
+# Using language codes
+cargo run -- create -t hr -b es
+
+# Custom deck name
+cargo run -- create \
+  -t Croatian \
+  -b Spanish \
+  -d "My Croatian Learning Deck"
+```
+
+**Dry run mode** (test configuration without creating deck):
+```bash
+cargo run -- create --dry-run
+# or
+make run ARGS="create --dry-run"
+```
+
+**Example interactive session:**
+```
+🚀 Anki Deck Builder - Language Learning Deck Creator
+
+? Select target language to learn ›
+❯ Croatian (hr)
+  Spanish (es)
+  English (en)
+  [... more ...]
+
+? Select base language (for translations) ›
+  Croatian (hr)
+❯ Spanish (es)
+  [... more ...]
+
+? Use default deck name: 'Croatian → Spanish (Top 800 Words)'? › yes
+
+📋 Configuration Summary:
+  Target language: Croatian (hr)
+  Base language: Spanish (es)
+  Words per part of speech: 100
+  Total cards: ~800 (8 parts of speech)
+  Deck name: Croatian → Spanish (Top 800 Words)
 ```
 
 ### View Configuration
@@ -194,6 +247,7 @@ RUST_LOG=debug make run ARGS="create"
 - [📋 Project Plan](docs/PROJECT_PLAN.md) - Complete 8-phase development plan
 - [✅ Phase 1 Summary](docs/PHASE1_SUMMARY.md) - Phase 1: Project setup
 - [✅ Phase 2 Summary](docs/PHASE2_SUMMARY.md) - Phase 2: AnkiConnect integration
+- [✅ Phase 3 Summary](docs/PHASE3_SUMMARY.md) - Phase 3: Interactive CLI interface
 - [📖 AnkiConnect Setup](docs/ANKICONNECT_SETUP.md) - Detailed setup and troubleshooting guide
 
 ## How It Works
