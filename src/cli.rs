@@ -315,17 +315,55 @@ async fn handle_create(
         }
     }
 
-    println!("\n⚠️  Translation and deck creation not yet implemented (Phase 5-7)");
-    println!("💡 Next steps:");
+    // Phase 5: Translate words
     println!(
-        "  - Phase 5: Translate {} words to {}",
+        "\n🌐 Translating {} words from {} to {}...",
         all_words.len(),
+        target_lang.name,
         base_lang.name
     );
-    println!(
-        "  - Phase 6-7: Create Anki deck and add {} cards",
-        all_words.len()
+
+    use crate::language::{LibreTranslateClient, Translator};
+
+    let translator =
+        LibreTranslateClient::new(config.libretranslate_url.clone(), Some(cache_dir.clone()))?;
+
+    let progress = ProgressBar::new(all_words.len() as u64);
+    progress.set_style(
+        ProgressStyle::default_bar()
+            .template("{msg} [{bar:40}] {pos}/{len} ({percent}%)")
+            .unwrap()
+            .progress_chars("=>-"),
     );
+    progress.set_message("Translating");
+
+    let mut translations: Vec<(String, String, PartOfSpeech)> = Vec::new();
+
+    for word in &all_words {
+        let translation = translator
+            .translate(&word.text, &target_lang.code, &base_lang.code)
+            .await?;
+        translations.push((word.text.clone(), translation, word.pos.clone()));
+        progress.inc(1);
+    }
+
+    progress.finish_with_message("✅ Translation complete");
+
+    println!("\n📝 Sample translations:");
+    for (croatian, spanish, pos) in translations.iter().take(10) {
+        println!("  {} → {} ({:?})", croatian, spanish, pos);
+    }
+    if translations.len() > 10 {
+        println!("  ... and {} more", translations.len() - 10);
+    }
+
+    println!("\n⚠️  Deck creation not yet implemented (Phase 6-7)");
+    println!("💡 Next steps:");
+    println!(
+        "  - Phase 6-7: Create Anki deck with {} cards",
+        translations.len()
+    );
+    println!("  - Add cards to your Anki collection");
 
     Ok(())
 }
