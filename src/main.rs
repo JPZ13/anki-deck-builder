@@ -1,5 +1,5 @@
-use anyhow::Result;
 use anki_deck_builder::cli;
+use anyhow::Result;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]

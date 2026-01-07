@@ -25,7 +25,10 @@ impl Note {
             deck_name,
             model_name: "Basic".to_string(),
             fields,
-            tags: vec!["auto-generated".to_string(), "language-learning".to_string()],
+            tags: vec![
+                "auto-generated".to_string(),
+                "language-learning".to_string(),
+            ],
         }
     }
 

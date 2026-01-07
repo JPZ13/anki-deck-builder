@@ -1,7 +1,7 @@
-use serde::{Deserialize, Serialize};
-use directories::ProjectDirs;
-use std::path::PathBuf;
 use anyhow::Result;
+use directories::ProjectDirs;
+use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
@@ -17,7 +17,7 @@ impl Config {
             .ok_or_else(|| anyhow::anyhow!("Could not determine project directories"))?;
 
         let cache_dir = project_dirs.data_dir().to_path_buf();
-        
+
         // Create cache directory if it doesn't exist
         std::fs::create_dir_all(&cache_dir)?;
 

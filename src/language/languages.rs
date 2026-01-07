@@ -19,17 +19,17 @@ impl Language {
 /// Get a language by code or name (case-insensitive)
 pub fn get_language(input: &str) -> Option<Language> {
     let input_lower = input.to_lowercase();
-    
+
     // Try as code first
     if let Some(name) = get_language_name(&input_lower) {
         return Some(Language::new(&input_lower, name));
     }
-    
+
     // Try as name
     if let Some(code) = get_language_code(&input_lower) {
         return Some(Language::new(code, input));
     }
-    
+
     None
 }
 
@@ -43,8 +43,9 @@ fn get_language_name(code: &str) -> Option<&'static str> {
 fn get_language_code(name: &str) -> Option<&'static str> {
     let languages = get_supported_languages_map();
     let name_lower = name.to_lowercase();
-    
-    languages.iter()
+
+    languages
+        .iter()
         .find(|(_, &lang_name)| lang_name.to_lowercase() == name_lower)
         .map(|(code, _)| *code)
 }
@@ -52,11 +53,11 @@ fn get_language_code(name: &str) -> Option<&'static str> {
 /// Supported languages for MVP (focused on Croatian and Spanish)
 fn get_supported_languages_map() -> HashMap<&'static str, &'static str> {
     let mut map = HashMap::new();
-    
+
     // MVP languages
     map.insert("hr", "Croatian");
     map.insert("es", "Spanish");
-    
+
     // Additional common languages for future expansion
     map.insert("en", "English");
     map.insert("fr", "French");
@@ -77,7 +78,7 @@ fn get_supported_languages_map() -> HashMap<&'static str, &'static str> {
     map.insert("fi", "Finnish");
     map.insert("el", "Greek");
     map.insert("tr", "Turkish");
-    
+
     map
 }
 
@@ -87,33 +88,33 @@ pub fn get_supported_languages() -> Vec<Language> {
         .iter()
         .map(|(&code, &name)| Language::new(code, name))
         .collect();
-    
+
     // Sort by name for better UX
     languages.sort_by(|a, b| a.name.cmp(&b.name));
-    
+
     languages
 }
 
 /// Get prioritized languages for selection (MVP languages first)
 pub fn get_prioritized_languages() -> Vec<Language> {
     let mut languages = Vec::new();
-    
+
     // MVP languages first
     languages.push(Language::new("hr", "Croatian"));
     languages.push(Language::new("es", "Spanish"));
-    
+
     // Then common languages
     languages.push(Language::new("en", "English"));
     languages.push(Language::new("fr", "French"));
     languages.push(Language::new("de", "German"));
     languages.push(Language::new("it", "Italian"));
     languages.push(Language::new("pt", "Portuguese"));
-    
+
     // Then rest alphabetically
     let mut others = get_supported_languages();
     others.retain(|lang| !["hr", "es", "en", "fr", "de", "it", "pt"].contains(&lang.code.as_str()));
     languages.extend(others);
-    
+
     languages
 }
 

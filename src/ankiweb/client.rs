@@ -1,5 +1,5 @@
-use crate::error::{AnkiDeckBuilderError, Result};
 use crate::ankiweb::models::Note;
+use crate::error::{AnkiDeckBuilderError, Result};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -37,7 +37,7 @@ impl AnkiClient {
     /// Verify that AnkiConnect is running and accessible
     pub async fn verify_connection(&self) -> Result<()> {
         debug!("Verifying connection to AnkiConnect at {}", self.base_url);
-        
+
         let request = AnkiRequest {
             action: "version".to_string(),
             version: 6,
@@ -63,14 +63,17 @@ impl AnkiClient {
             return Err(AnkiDeckBuilderError::AnkiConnectError(error));
         }
 
-        info!("Successfully connected to AnkiConnect (version: {:?})", anki_response.result);
+        info!(
+            "Successfully connected to AnkiConnect (version: {:?})",
+            anki_response.result
+        );
         Ok(())
     }
 
     /// Create a new deck
     pub async fn create_deck(&self, name: &str) -> Result<i64> {
         debug!("Creating deck: {}", name);
-        
+
         let request = AnkiRequest {
             action: "createDeck".to_string(),
             version: 6,
@@ -105,7 +108,7 @@ impl AnkiClient {
     /// Add a note to a deck
     pub async fn add_note(&self, note: &Note) -> Result<i64> {
         debug!("Adding note to deck: {}", note.deck_name);
-        
+
         let request = AnkiRequest {
             action: "addNote".to_string(),
             version: 6,
@@ -147,7 +150,7 @@ impl AnkiClient {
     /// Get list of all deck names
     pub async fn get_decks(&self) -> Result<Vec<String>> {
         debug!("Fetching deck names");
-        
+
         let request = AnkiRequest {
             action: "deckNames".to_string(),
             version: 6,

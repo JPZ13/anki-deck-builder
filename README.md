@@ -245,9 +245,11 @@ RUST_LOG=debug make run ARGS="create"
 ### Documentation
 
 - [📋 Project Plan](docs/PROJECT_PLAN.md) - Complete 8-phase development plan
+- [📊 Progress Summary](docs/PROGRESS_SUMMARY.md) - Detailed progress tracking
 - [✅ Phase 1 Summary](docs/PHASE1_SUMMARY.md) - Phase 1: Project setup
 - [✅ Phase 2 Summary](docs/PHASE2_SUMMARY.md) - Phase 2: AnkiConnect integration
 - [✅ Phase 3 Summary](docs/PHASE3_SUMMARY.md) - Phase 3: Interactive CLI interface
+- [✅ Phase 4 Summary](docs/PHASE4_SUMMARY.md) - Phase 4: Word frequency data
 - [📖 AnkiConnect Setup](docs/ANKICONNECT_SETUP.md) - Detailed setup and troubleshooting guide
 
 ## How It Works
