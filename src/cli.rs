@@ -357,13 +357,98 @@ async fn handle_create(
         println!("  ... and {} more", translations.len() - 10);
     }
 
-    println!("\n⚠️  Deck creation not yet implemented (Phase 6-7)");
-    println!("💡 Next steps:");
-    println!(
-        "  - Phase 6-7: Create Anki deck with {} cards",
-        translations.len()
+    // Phase 6-7: Create Anki deck and add cards
+    println!("\n📚 Creating Anki deck: '{}'...", final_deck_name);
+
+    use crate::AnkiClient;
+
+    let anki_client = AnkiClient::new(config.ankiconnect_url.clone())?;
+
+    // Verify AnkiConnect is running
+    let verify_spinner = ProgressBar::new_spinner();
+    verify_spinner.set_style(
+        ProgressStyle::default_spinner()
+            .template("{spinner:.green} {msg}")
+            .unwrap(),
     );
-    println!("  - Add cards to your Anki collection");
+    verify_spinner.set_message("Checking AnkiConnect connection...");
+    verify_spinner.enable_steady_tick(std::time::Duration::from_millis(100));
+
+    match anki_client.verify_connection().await {
+        Ok(()) => {
+            verify_spinner.finish_with_message("✅ Connected to AnkiConnect");
+        }
+        Err(e) => {
+            verify_spinner.finish_with_message("❌ Failed to connect");
+            eprintln!("\n❌ Could not connect to AnkiConnect: {}", e);
+            eprintln!("\n💡 Make sure:");
+            eprintln!("  1. Anki is running");
+            eprintln!("  2. AnkiConnect add-on is installed");
+            eprintln!("  3. Try running: make run ARGS=\"test\"");
+            return Err(e.into());
+        }
+    }
+
+    // Create deck
+    match anki_client.create_deck(&final_deck_name).await {
+        Ok(deck_id) => {
+            println!("✅ Created deck with ID: {}", deck_id);
+        }
+        Err(e) => {
+            // Deck might already exist, which is ok
+            tracing::warn!("Deck creation returned: {}", e);
+            println!("ℹ️  Using existing deck '{}'", final_deck_name);
+        }
+    }
+
+    // Add cards
+    println!("\n📝 Adding {} cards to deck...", translations.len());
+
+    use crate::Note;
+
+    let card_progress = ProgressBar::new(translations.len() as u64);
+    card_progress.set_style(
+        ProgressStyle::default_bar()
+            .template("{msg} [{bar:40}] {pos}/{len} ({percent}%)")
+            .unwrap()
+            .progress_chars("=>-"),
+    );
+    card_progress.set_message("Adding cards");
+
+    let mut success_count = 0;
+    let mut error_count = 0;
+
+    for (croatian, spanish, pos) in &translations {
+        let front = croatian.clone();
+        let back = format!("{}\n<br><small><i>{:?}</i></small>", spanish, pos);
+
+        let note = Note::new(final_deck_name.clone(), front, back);
+
+        match anki_client.add_note(&note).await {
+            Ok(_) => {
+                success_count += 1;
+            }
+            Err(e) => {
+                tracing::warn!("Failed to add note for '{}': {}", croatian, e);
+                error_count += 1;
+            }
+        }
+
+        card_progress.inc(1);
+    }
+
+    card_progress.finish_with_message("✅ Cards added");
+
+    println!("\n🎉 Deck creation complete!");
+    println!("  ✅ {} cards added successfully", success_count);
+    if error_count > 0 {
+        println!("  ⚠️  {} cards failed (may be duplicates)", error_count);
+    }
+    println!("  📚 Deck name: {}", final_deck_name);
+    println!(
+        "\n💡 Open Anki to start studying your {} words!",
+        success_count
+    );
 
     Ok(())
 }
