@@ -50,6 +50,16 @@ Install AnkiConnect in Anki:
 3. Code: `2055492159`
 4. Restart Anki
 
+**Verify the setup:**
+```bash
+# Test AnkiConnect connection
+cargo run -- test
+# or
+make run ARGS="test"
+```
+
+See [📖 AnkiConnect Setup Guide](docs/ANKICONNECT_SETUP.md) for detailed instructions and troubleshooting.
+
 ## Installation
 
 ```bash
@@ -182,7 +192,9 @@ RUST_LOG=debug make run ARGS="create"
 ### Documentation
 
 - [📋 Project Plan](docs/PROJECT_PLAN.md) - Complete 8-phase development plan
-- [✅ Phase 1 Summary](docs/PHASE1_SUMMARY.md) - Phase 1 completion details
+- [✅ Phase 1 Summary](docs/PHASE1_SUMMARY.md) - Phase 1: Project setup
+- [✅ Phase 2 Summary](docs/PHASE2_SUMMARY.md) - Phase 2: AnkiConnect integration
+- [📖 AnkiConnect Setup](docs/ANKICONNECT_SETUP.md) - Detailed setup and troubleshooting guide
 
 ## How It Works
 

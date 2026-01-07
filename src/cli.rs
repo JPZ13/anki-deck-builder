@@ -12,6 +12,9 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
+    /// Test connection to AnkiConnect
+    Test,
+
     /// Create a new language learning deck
     Create {
         /// Target language to learn (e.g., "Croatian", "hr")
@@ -51,6 +54,7 @@ pub async fn run() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
+        Commands::Test => handle_test().await,
         Commands::Create {
             target_language,
             base_language,
@@ -74,6 +78,52 @@ pub async fn run() -> Result<()> {
     }
 }
 
+async fn handle_test() -> Result<()> {
+    use crate::{Config, AnkiClient};
+    
+    println!("🔍 Testing AnkiConnect connection...\n");
+    
+    let config = Config::new()?;
+    println!("📍 AnkiConnect URL: {}", config.ankiconnect_url);
+    
+    let client = AnkiClient::new(config.ankiconnect_url.clone())?;
+    
+    match client.verify_connection().await {
+        Ok(()) => {
+            println!("✅ Successfully connected to AnkiConnect!\n");
+            
+            // Try to get decks
+            match client.get_decks().await {
+                Ok(decks) => {
+                    println!("📚 Available decks ({}):", decks.len());
+                    for deck in decks.iter().take(10) {
+                        println!("  - {}", deck);
+                    }
+                    if decks.len() > 10 {
+                        println!("  ... and {} more", decks.len() - 10);
+                    }
+                }
+                Err(e) => {
+                    println!("⚠️  Could not retrieve decks: {}", e);
+                }
+            }
+            
+            Ok(())
+        }
+        Err(e) => {
+            println!("❌ Failed to connect to AnkiConnect");
+            println!("\nError: {}\n", e);
+            println!("💡 Troubleshooting:");
+            println!("  1. Make sure Anki is running");
+            println!("  2. Verify AnkiConnect add-on is installed (code: 2055492159)");
+            println!("  3. Check that AnkiConnect is accessible at {}", config.ankiconnect_url);
+            println!("  4. Try restarting Anki if the add-on was just installed");
+            
+            Err(e.into())
+        }
+    }
+}
+
 async fn handle_create(
     target_language: Option<String>,
     base_language: Option<String>,
@@ -92,7 +142,7 @@ async fn handle_create(
 }
 
 async fn handle_config(ankiconnect_url: Option<String>, show: bool) -> Result<()> {
-    use crate::config::Config;
+    use crate::Config;
 
     if show {
         let config = Config::new()?;

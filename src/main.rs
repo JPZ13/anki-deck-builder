@@ -1,10 +1,5 @@
-mod cli;
-mod config;
-mod error;
-mod ankiweb;
-mod language;
-
 use anyhow::Result;
+use anki_deck_builder::cli;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]

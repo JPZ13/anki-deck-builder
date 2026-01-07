@@ -5,7 +5,7 @@ edition = "2021"
 authors = ["J.P. Zivalich <j.p.zivalich@gmail.com>"]
 description = "A CLI tool to automatically build language learning Anki decks"
 license = "MIT"
-repository = "https://github.com/yourusername/anki-deck-builder"
+repository = "https://github.com/JPZ13/anki-deck-builder"
 
 [dependencies]
 # CLI
@@ -41,6 +41,10 @@ async-trait = "0.1"
 [dev-dependencies]
 mockito = "1.4"
 tokio-test = "0.4"
+
+[lib]
+name = "anki_deck_builder"
+path = "src/lib.rs"
 
 [[bin]]
 name = "anki-deck-builder"
