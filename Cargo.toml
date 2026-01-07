@@ -1,0 +1,47 @@
+[package]
+name = "anki-deck-builder"
+version = "0.1.0"
+edition = "2021"
+authors = ["J.P. Zivalich <j.p.zivalich@gmail.com>"]
+description = "A CLI tool to automatically build language learning Anki decks"
+license = "MIT"
+repository = "https://github.com/yourusername/anki-deck-builder"
+
+[dependencies]
+# CLI
+clap = { version = "4.5", features = ["derive"] }
+dialoguer = "0.11"
+indicatif = "0.17"
+
+# HTTP/API
+reqwest = { version = "0.11", features = ["json", "cookies", "rustls-tls"], default-features = false }
+
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Configuration
+config = "0.14"
+directories = "5.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Async trait support
+async-trait = "0.1"
+
+[dev-dependencies]
+mockito = "1.4"
+tokio-test = "0.4"
+
+[[bin]]
+name = "anki-deck-builder"
+path = "src/main.rs"
