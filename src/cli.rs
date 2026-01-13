@@ -343,10 +343,9 @@ async fn handle_create(
         base_lang.name
     );
 
-    use crate::language::{LibreTranslateClient, Translator};
+    use crate::language::{MyMemoryClient, Translator};
 
-    let translator =
-        LibreTranslateClient::new(config.libretranslate_url.clone(), Some(cache_dir.clone()))?;
+    let translator = MyMemoryClient::new(Some(cache_dir.clone()))?;
 
     let progress = ProgressBar::new(all_words.len() as u64);
     progress.set_style(
@@ -452,11 +451,11 @@ async fn handle_create(
     let mut success_count = 0;
     let mut error_count = 0;
 
-    for (croatian, spanish, pos) in &translations {
+    for (croatian, spanish, _pos) in &translations {
         // Direction 1: Croatian (target) → Spanish (base)
         // You see Croatian and recall the Spanish meaning
         let front1 = croatian.clone();
-        let back1 = format!("{}\n<br><small><i>{:?}</i></small>", spanish, pos);
+        let back1 = spanish.clone();
         let note1 = Note::new(final_deck_name.clone(), front1, back1).with_tags(vec![
             "auto-generated".to_string(),
             "croatian-to-spanish".to_string(),
@@ -475,7 +474,7 @@ async fn handle_create(
         // You see Spanish and recall the Croatian word
         if bidirectional {
             let front2 = spanish.clone();
-            let back2 = format!("{}\n<br><small><i>{:?}</i></small>", croatian, pos);
+            let back2 = croatian.clone();
             let note2 = Note::new(final_deck_name.clone(), front2, back2).with_tags(vec![
                 "auto-generated".to_string(),
                 "spanish-to-croatian".to_string(),
@@ -515,11 +514,7 @@ async fn handle_config(ankiconnect_url: Option<String>, show: bool) -> Result<()
         let config = Config::new()?;
         println!("Current configuration:");
         println!("  AnkiConnect URL: {}", config.ankiconnect_url);
-        println!(
-            "  DeepL API Key: {}",
-            config.deepl_api_key.as_deref().unwrap_or("Not set")
-        );
-        println!("  LibreTranslate URL: {}", config.libretranslate_url);
+        println!("  Translation Service: MyMemory (no API key required)");
         println!("  Cache directory: {}", config.cache_dir.display());
         return Ok(());
     }

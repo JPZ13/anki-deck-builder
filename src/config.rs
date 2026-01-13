@@ -6,8 +6,6 @@ use std::path::PathBuf;
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
     pub ankiconnect_url: String,
-    pub deepl_api_key: Option<String>,
-    pub libretranslate_url: String,
     pub cache_dir: PathBuf,
 }
 
@@ -24,9 +22,6 @@ impl Config {
         Ok(Config {
             ankiconnect_url: std::env::var("ANKICONNECT_URL")
                 .unwrap_or_else(|_| "http://localhost:8765".to_string()),
-            deepl_api_key: std::env::var("DEEPL_API_KEY").ok(),
-            libretranslate_url: std::env::var("LIBRETRANSLATE_URL")
-                .unwrap_or_else(|_| "https://libretranslate.com".to_string()),
             cache_dir,
         })
     }
